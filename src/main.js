@@ -128,7 +128,7 @@ function viewSavedCovers() {
 
 function deleteSavedCover(e){
   for (var i = 0; i < savedCovers.length; i++) {
-    if (Number(e.target.parentElement.id) === Number(savedCovers[i].id)) {
+    if (Number(e.target.parentElement.id) === savedCovers[i].id) {
       savedCovers.splice(i, 1);
       document.getElementById(e.target.parentElement.id).remove();
     }
