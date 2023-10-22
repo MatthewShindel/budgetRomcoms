@@ -1,4 +1,3 @@
-// Create variables targetting the relevant DOM elements here 👇
 var coverImage = document.querySelector('.cover-image');
 var coverTitle = document.querySelector('.cover-title');
 var tagline1 = document.querySelector('.tagline-1');
@@ -17,26 +16,23 @@ var userCover = document.querySelector('.user-cover');
 var userTitle = document.querySelector('.user-title');
 var userDesc1 = document.querySelector('.user-desc1');
 var userDesc2 = document.querySelector('.user-desc2');
-var savedViewCovers = document.querySelector('.saved-covers-section')
+var savedViewCovers = document.querySelector('.saved-covers-section');
 
-var savedCovers = [];
+var savedCovers = JSON.parse(localStorage.getItem("saved-covers")) || [];
 var currentCover;
 var imageSrc;
 var title;
 var descriptor1;
 var descriptor2;
 
-// Add your event listeners here 👇
-
+window.addEventListener('load', renderSavedCovers())
 randomCoverBtn.addEventListener('click', randomizeCover);
 saveCoverBtn.addEventListener('click', saveCover);
 homeButton.addEventListener('click', navToHomePage);
 viewSavedBtn.addEventListener('click', navToSavedPage);
 makeNewBtn.addEventListener('click', navToMakeNewPage);
 createNewCoverBtn.addEventListener('click', validateForm);
-savedViewCovers.addEventListener('dblclick', (e) => { deleteSavedCover(e) });
-
-// Create your event handlers and other functions here 👇
+savedViewCovers.addEventListener('dblclick', (e) => {deleteSavedCover(e)});
 
 function randomizeCover() {
   imageSrc = covers[getRandomIndex(covers)];
@@ -92,38 +88,39 @@ function renderUserCover() {
 
 function saveCover() {
   for (var i = 0; i < savedCovers.length; i++) {
-    if (savedCovers[i].id === currentCover.id)
-      return;
+    if (savedCovers[i].id === currentCover.id) return;
   }
   savedCovers.push(currentCover)
-  savedViewCovers.appendChild(viewSavedCovers());
+  renderSavedCovers();
 }
 
-function viewSavedCovers() {
-  var newSavedCoverImage = document.createElement('img');
-  newSavedCoverImage.classList.add('mini-cover');
-  newSavedCoverImage.src = currentCover.coverImg;
-
-  var newSavedCoverTitle = document.createElement('h2');
-  newSavedCoverTitle.classList.add('cover-title');
-  newSavedCoverTitle.innerText = currentCover.title;
-
-  var newSavedCoverTagline = document.createElement('h3');
-  newSavedCoverTagline.classList.add('tagline');
-  var newSavedCoverTagline1 = document.createElement('span');
-  newSavedCoverTagline1.innerText = currentCover.tagline1;
-
-  var newSavedCoverTagline2 = document.createElement('span');
-  newSavedCoverTagline2.innerText = currentCover.tagline2;
-  var newSavedCoverTaglineText = 
-  document.createTextNode(`A tale of ${newSavedCoverTagline1.innerText} and ${newSavedCoverTagline2.innerText}`);
-  newSavedCoverTagline.appendChild(newSavedCoverTaglineText);
-
-  var newSavedCover = document.createElement('section');
-  newSavedCover.classList.add('mini-cover');
-  newSavedCover.setAttribute("id", currentCover.id);
-  newSavedCover.append(newSavedCoverImage, newSavedCoverTitle, newSavedCoverTagline)
-  return newSavedCover;
+function renderSavedCovers() {
+  clearElement(savedViewCovers);
+  for (var i = 0; i < savedCovers.length; i++) {
+    var newSavedCover = document.createElement('section');
+    newSavedCover.classList.add('mini-cover');
+    var newSavedCoverImage = document.createElement('img');
+    newSavedCoverImage.classList.add('mini-cover');
+    newSavedCoverImage.src = savedCovers[i].coverImg
+    var newSavedCoverTitle = document.createElement('h2');
+    newSavedCoverTitle.classList.add('cover-title');
+    newSavedCoverTitle.innerText = savedCovers[i].title
+    var newSavedCoverTagline = document.createElement('h3');
+    newSavedCoverTagline.classList.add('tagline');
+    var newSavedCoverTagline1 = document.createElement('span');
+    newSavedCoverTagline1.innerText = savedCovers[i].tagline1;
+    var newSavedCoverTagline2 = document.createElement('span');
+    newSavedCoverTagline2.innerText = savedCovers[i].tagline2;
+    var newSavedCoverTaglineText = 
+      document.createTextNode(`A tale of ${newSavedCoverTagline1.innerText} 
+        and ${newSavedCoverTagline2.innerText}`);
+    newSavedCoverTagline.appendChild(newSavedCoverTaglineText);
+    newSavedCover.setAttribute("id", savedCovers[i].id);
+    newSavedCover.append(newSavedCoverImage, newSavedCoverTitle, newSavedCoverTagline);
+    savedViewCovers.appendChild(newSavedCover)
+  }
+  persistSavedCovers();
+  return savedViewCovers
 }
 
 function deleteSavedCover(e){
@@ -133,6 +130,7 @@ function deleteSavedCover(e){
       document.getElementById(e.target.parentElement.id).remove();
     }
   }
+  persistSavedCovers();
 }
 
 function navToSavedPage() {
@@ -173,5 +171,15 @@ function createCover(imgSrc, title, descriptor1, descriptor2) {
     tagline1: descriptor1,
     tagline2: descriptor2
   }
-  return cover
+  return cover;
+}
+
+function clearElement(element) {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild)
+  }
+}
+
+function persistSavedCovers() {
+  return localStorage.setItem("saved-covers", JSON.stringify(savedCovers));
 }
