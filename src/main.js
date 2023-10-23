@@ -25,7 +25,10 @@ var title;
 var descriptor1;
 var descriptor2;
 
-window.addEventListener('load', renderSavedCovers())
+window.addEventListener('load', () => {
+  randomizeCover();
+  renderSavedCovers();
+})
 randomCoverBtn.addEventListener('click', randomizeCover);
 saveCoverBtn.addEventListener('click', saveCover);
 homeButton.addEventListener('click', navToHomePage);
